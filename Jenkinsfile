@@ -39,7 +39,12 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                echo 'Deploying app...'
+                bat '''
+                    if exist deployed_app rmdir /S /Q deployed_app
+                    mkdir deployed_app
+                    xcopy src deployed_app\\src\\ /E /I /Y
+                    venv\\Scripts\\python.exe -c "from deployed_app.src.app import add; assert add(2, 3) == 5; print('Smoke test passed from deployed_app')"
+                '''
             }
         }
     }
